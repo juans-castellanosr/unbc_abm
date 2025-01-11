@@ -1,0 +1,144 @@
+source: https://github.com/juans-castellanosr/unbc_abm.git
+root: public_html/public
+features:
+  - php 8.4
+  - mysql
+  - node 18.20.5
+
+php:
+  expose_php: "off"
+  session.cookie_secure: "on"
+  session.cookie_httponly: "on"
+  session.use_strict_mode: "on"
+  display_errors: "off"
+  max_execution_time: 30
+  max_input_time: 60
+  memory_limit: "128M"
+  post_max_size: "20M"
+  upload_max_filesize: "10M"
+  default_charset: "UTF-8"
+
+nginx:
+  fastcgi: "on"
+  http2: true
+  server_tokens: "off"
+  charset: "utf-8"
+
+  add_header:
+    - "X-Frame-Options SAMEORIGIN"
+    - "X-XSS-Protection \"1; mode=block\""
+    - "X-Content-Type-Options nosniff"
+    - "Strict-Transport-Security \"max-age=31536000; includeSubDomains; preload\""
+    - "Content-Security-Policy \"default-src 'self' https: data:; script-src 'self' https:; style-src 'self' https:; img-src 'self' data: https:; font-src 'self' data:;\""
+    - "Referrer-Policy \"strict-origin-when-cross-origin\""
+
+  fastcgi_param:
+    - "HTTP_COOKIE $http_cookie"
+    - "HTTP_X_CSRF_TOKEN $http_x_csrf_token"
+
+  access_log: "on"
+
+  locations:
+    - match: /
+      try_files: $uri $uri/ /index.php$is_args$args
+
+    - match: ~ \.[^\/]+(?<!\.php)$
+      try_files: $uri =404
+
+    - match: ~ ^/build/(.*)$
+      root: /public_html/public/build
+
+    - match: ~ ^/vendor/livewire/
+      try_files: $uri $uri/ /index.php$is_args$args
+
+    - match: "/app/app-key"
+      proxy_pass: "http://127.0.0.1:6001"
+      proxy_read_timeout: "60"
+      proxy_connect_timeout: "60"
+      proxy_redirect: "off"
+      proxy_http_version: "1.1"
+      proxy_cache_bypass: "$http_upgrade"
+      proxy_set_header:
+        - "Upgrade $http_upgrade"
+        - "Connection 'upgrade'"
+        - "Host $host"
+        - "X-Real-IP $remote_addr"
+        - "X-Forwarded-For $proxy_add_x_forwarded_for"
+        - "X-Forwarded-Proto $scheme"
+
+  locations_https:
+    - match: "/app/app-key"
+      proxy_pass: "https://127.0.0.1:6001"
+      proxy_http_version: "1.1"
+      proxy_set_header:
+        - "Upgrade $http_upgrade"
+        - "Connection 'upgrade'"
+        - "Host $host"
+        - "X-Real-IP $remote_addr"
+        - "X-Forwarded-For $proxy_add_x_forwarded_for"
+        - "X-Forwarded-Proto $scheme"
+
+commands:
+  - composer install
+  - npm install -g @soketi/soketi
+  - npm install -g pm2
+  - npm install
+
+  # Initial configuration
+  - cp .env.example .env
+
+  # Configuration of the database
+  - sed -ri "s/(# )?DB_DATABASE=.*/DB_DATABASE=${DATABASE}/g" .env
+  - sed -ri "s/(# )?DB_USERNAME=.*/DB_USERNAME=${USERNAME}/g" .env
+  - sed -ri "s/(# )?DB_PASSWORD=.*/DB_PASSWORD=${MYPASSWD}/g" .env
+
+  # Application configuration
+  - sed -ri "s/APP_URL=.*/APP_URL=https:\/\/${DOMAIN}/g" .env
+  - sed -ri "s/(# )?APP_ENV=.*/APP_ENV=production/g" .env
+  - sed -ri "s/(# )?APP_DEBUG=.*/APP_DEBUG=false/g" .env
+
+  # Mail configuration
+  - sed -ri "s/(# )?MAIL_MAILER=.*/MAIL_MAILER=smtp/g" .env
+  - sed -ri "s/(# )?MAIL_HOST=.*/MAIL_HOST=smtp.mailersend.net/g" .env
+  - sed -ri "s/(# )?MAIL_PORT=.*/MAIL_PORT=587/g" .env
+  - sed -ri "s/(# )?MAIL_USERNAME=.*/MAIL_USERNAME=MS_EJ6XIw@trial-x2p03477zzk4zdrn.mlsender.net/g" .env
+  - sed -ri "s/(# )?MAIL_PASSWORD=.*/MAIL_PASSWORD=k4jnj8u3qsXTQLQm/g" .env
+  - sed -ri "s/(# )?MAIL_ENCRYPTION=.*/MAIL_ENCRYPTION=tls/g" .env
+  - sed -ri "s/(# )?MAIL_SCHEME=.*/MAIL_SCHEME=smtps/g" .env
+  - sed -ri "s/(# )?MAIL_FROM_ADDRESS=.*/MAIL_FROM_ADDRESS=hello@trial-x2p03477zzk4zdrn.mlsender.net/g" .env
+
+  # Vite configuration
+  - sed -ri "s/(# )?VITE_PUSHER_PORT=.*/VITE_PUSHER_PORT=443/g" .env
+
+  # Cleaning
+  - php artisan config:clear
+  - php artisan route:clear
+  - php artisan view:clear
+
+  # Construction of assets
+  - npm run build
+
+  # Laravel configuration
+  - php artisan key:generate
+  - php artisan storage:link
+  - php artisan livewire:publish --assets
+  - php artisan migrate --force
+  - php artisan db:seed --force
+
+  # Caching
+  - php artisan config:cache
+  - php artisan route:cache
+  - php artisan view:cache
+
+  # Optimization
+  - php artisan optimize
+
+  # Post-installation
+  - mv public/build/.vite/manifest.json public/build/manifest.json || true
+  - chmod -R 775 storage bootstrap/cache
+  - echo "Contact: mailto:security@${DOMAIN}" > public/.well-known/security.txt
+  - echo "Expires: $(date -d '+1 year' -u +'%Y-%m-%dT%H:%M:%SZ')" >> public/.well-known/security.txt
+
+  # Start of services
+  - pm2 start soketi-pm2 -- start
+  - pm2 save
