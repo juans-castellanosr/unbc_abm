@@ -20,7 +20,7 @@ state([
 ?>
 
 <div>
-    <nav x-data="{ 
+    <nav x-data="{
         open: false,
         atTop: true,
         lastScroll: 0,
@@ -39,13 +39,13 @@ state([
                 this.lastScroll = currentScroll;
             });
         }
-    }" 
-    class="bg-[#1e293b]/95 backdrop-blur-sm border-b border-[#475569] fixed w-full top-0 transition-transform duration-300 z-50" 
+    }"
+    class="bg-[#1e293b]/95 backdrop-blur-sm border-b border-[#475569] fixed w-full top-0 transition-transform duration-300 z-50"
     :class="{ 'translate-y-0': !hidden || atTop, '-translate-y-full': hidden && !atTop }">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex">
-                    <div class="flex-shrink-0 flex items-center">
+                    <div class="flex items-center flex-shrink-0">
                         <a href="{{ route('landing-page') }}" wire:navigate>
                             <div class="w-10 h-10 bg-indigo-500 rounded-full"></div>
                         </a>
@@ -54,8 +54,8 @@ state([
                     @auth
                     <div class="hidden sm:flex sm:items-center sm:ml-6">
                         <div class="space-x-8">
-                            <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" 
-                                class="text-[#e2e8f0] hover:text-[#94a3b8] transition-colors duration-200" 
+                            <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')"
+                                class="text-[#e2e8f0] hover:text-[#94a3b8] transition-colors duration-200"
                                 wire:navigate>
                                 {{ __('Dashboard') }}
                             </x-nav-link>
@@ -82,7 +82,7 @@ state([
                                 </div>
 
                                 <div class="ml-1">
-                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg"
+                                    <svg class="w-4 h-4 fill-current" xmlns="http://www.w3.org/2000/svg"
                                         viewBox="0 0 20 20">
                                         <path fill-rule="evenodd"
                                             d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
@@ -93,13 +93,13 @@ state([
                         </x-slot>
 
                         <x-slot name="content">
-                            <x-dropdown-link :href="route('profile')" wire:navigate 
+                            <x-dropdown-link :href="route('profile')" wire:navigate
                                 class="text-[#e2e8f0] hover:text-[#94a3b8] hover:bg-[#252f3f] transition-colors duration-200">
                                 {{ __('Profile') }}
                             </x-dropdown-link>
 
                             <button wire:click="logout" class="w-full text-start">
-                                <x-dropdown-link 
+                                <x-dropdown-link
                                     class="text-red-400 hover:text-red-300 hover:bg-[#252f3f] transition-colors duration-200">
                                     {{ __('Log Out') }}
                                 </x-dropdown-link>
@@ -112,7 +112,7 @@ state([
                 <div class="flex items-center sm:hidden">
                     <button @click="open = !open"
                         class="inline-flex items-center justify-center p-2 rounded-lg text-[#e2e8f0] hover:text-[#94a3b8] transition-colors duration-200">
-                        <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                             <path :class="{'hidden': open, 'inline-flex': !open }" class="inline-flex"
                                 stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M4 6h16M4 12h16M4 18h16" />
@@ -124,12 +124,12 @@ state([
             </div>
         </div>
 
-        <div :class="{'block': open, 'hidden': !open}" 
+        <div :class="{'block': open, 'hidden': !open}"
             class="sm:hidden bg-[#1e293b] border-t border-[#475569]">
             @auth
             <div class="px-4 pt-2 pb-3 space-y-1">
-                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" 
-                    class="block px-3 py-2 rounded-lg text-[#e2e8f0] hover:text-[#94a3b8] transition-colors duration-200" 
+                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')"
+                    class="block px-3 py-2 rounded-lg text-[#e2e8f0] hover:text-[#94a3b8] transition-colors duration-200"
                     wire:navigate>
                     {{ __('Dashboard') }}
                 </x-responsive-nav-link>
@@ -143,15 +143,15 @@ state([
                     </div>
                 </div>
 
-                <div class="mt-3 space-y-1 px-4">
-                    <x-responsive-nav-link :href="route('profile')" wire:navigate 
+                <div class="px-4 mt-3 space-y-1">
+                    <x-responsive-nav-link :href="route('profile')" wire:navigate
                         class="block px-3 py-2 rounded-lg text-[#e2e8f0] hover:text-[#94a3b8] transition-colors duration-200">
                         {{ __('Profile') }}
                     </x-responsive-nav-link>
 
                     <button wire:click="logout" class="w-full text-start">
-                        <x-responsive-nav-link 
-                            class="block px-3 py-2 rounded-lg text-red-400 hover:text-red-300 transition-colors duration-200">
+                        <x-responsive-nav-link
+                            class="block px-3 py-2 text-red-400 transition-colors duration-200 rounded-lg hover:text-red-300">
                             {{ __('Log Out') }}
                         </x-responsive-nav-link>
                     </button>
@@ -161,7 +161,7 @@ state([
 
             @guest
             <div class="px-4 pt-2 pb-3 space-y-1">
-                <x-responsive-nav-link :href="route('login')" wire:navigate 
+                <x-responsive-nav-link :href="route('login')" wire:navigate
                     class="block px-3 py-2 rounded-lg text-[#e2e8f0] hover:text-[#94a3b8] transition-colors duration-200">
                     {{ __('Login') }}
                 </x-responsive-nav-link>

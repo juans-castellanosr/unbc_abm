@@ -15,7 +15,11 @@ $sendVerification = function () {
         return;
     }
 
-    Auth::user()->sendEmailVerificationNotification();
+    try {
+        Auth::user()->sendEmailVerificationNotification();
+    } catch (\Exception $e) {
+        \Log::error("The email could not be sent.", ['exception' => $e]);
+    }
 
     Session::flash('status', 'verification-link-sent');
 };
@@ -40,17 +44,17 @@ $logout = function (Logout $logout) {
             </div>
         @endif
 
-        <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <x-primary-button 
+        <div class="flex flex-col items-center justify-between gap-4 sm:flex-row">
+            <x-primary-button
                 wire:click="sendVerification"
-                class="w-full sm:w-auto bg-blue-500 hover:bg-blue-400 text-white px-6 py-3 rounded-xl transition-colors duration-200">
+                class="w-full px-6 py-3 text-white transition-colors duration-200 bg-blue-500 sm:w-auto hover:bg-blue-400 rounded-xl">
                 {{ __('Resend Verification Email') }}
             </x-primary-button>
 
-            <button 
-                wire:click="logout" 
-                type="submit" 
-                class="text-sm text-blue-400 hover:text-blue-300 transition-colors duration-200">
+            <button
+                wire:click="logout"
+                type="submit"
+                class="text-sm text-blue-400 transition-colors duration-200 hover:text-blue-300">
                 {{ __('Log Out') }}
             </button>
         </div>

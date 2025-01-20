@@ -16,9 +16,11 @@ rules(['email' => ['required', 'string', 'email']]);
 $sendPasswordResetLink = function () {
     $this->validate();
 
-    $status = Password::sendResetLink(
-        $this->only('email')
-    );
+    try {
+        $status = Password::sendResetLink($this->only('email'));
+    } catch (\Exception $e) {
+        \Log::error("The email could not be sent.", ['exception' => $e]);
+    }
 
     if ($status != Password::RESET_LINK_SENT) {
         $this->addError('email', __($status));
@@ -42,19 +44,15 @@ $sendPasswordResetLink = function () {
         <form wire:submit="sendPasswordResetLink">
             <div class="mb-4">
                 <x-input-label for="email" :value="__('Email')" class="text-[#e2e8f0]" />
-                <x-text-input 
-                    wire:model="email" 
-                    id="email" 
+                <x-text-input wire:model="email" id="email"
                     class="w-full h-12 rounded-xl bg-[#334155] border border-[#475569] px-4 text-[#e2e8f0] mt-2"
-                    type="email" 
-                    name="email" 
-                    required 
-                    autofocus />
+                    type="email" name="email" required autofocus />
                 <x-input-error :messages="$errors->get('email')" class="mt-2" />
             </div>
 
             <div class="flex justify-end mt-6">
-                <x-primary-button class="bg-blue-500 hover:bg-blue-400 text-white px-6 py-3 rounded-xl transition-colors duration-200">
+                <x-primary-button
+                    class="px-6 py-3 text-white transition-colors duration-200 bg-blue-500 hover:bg-blue-400 rounded-xl">
                     {{ __('Email Password Reset Link') }}
                 </x-primary-button>
             </div>

@@ -15,14 +15,14 @@
     @livewireStyles
 </head>
 
-<body class="font-sans antialiased text-slate-100 bg-gray-100 dark:bg-gray-900">
+<body class="font-sans antialiased bg-gray-100 text-slate-100 dark:bg-gray-900">
     <x-circles></x-circles>
 
-    <div class="min-h-screen flex flex-col justify-between bg-gray-100 dark:bg-gray-900">
+    <div class="flex flex-col justify-between min-h-screen bg-gray-100 dark:bg-gray-900">
         <livewire:layout.navigation wire:key="guest-navigation" />
 
-        <main class="flex-grow flex flex-col sm:justify-center items-center pt-6 sm:pt-0 px-4 sm:px-6 md:px-8">
-            <div class="w-full sm:max-w-md mt-6 px-6 py-4 overflow-hidden sm:rounded-lg">
+        <main class="flex flex-col items-center flex-grow px-4 pt-6 sm:justify-center sm:pt-0 sm:px-6 md:px-8">
+            <div class="w-full px-6 py-4 mt-6 overflow-hidden sm:max-w-md sm:rounded-lg">
                 {{ $slot }}
             </div>
         </main>

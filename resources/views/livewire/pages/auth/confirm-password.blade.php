@@ -47,14 +47,14 @@ $confirmPassword = function () {
                     class="w-full h-12 rounded-xl bg-[#334155] border border-[#475569] px-4 text-[#e2e8f0] mt-2"
                     type="password"
                     name="password"
-                    required 
+                    required
                     autocomplete="current-password" />
 
                 <x-input-error :messages="$errors->get('password')" class="mt-2" />
             </div>
 
             <div class="flex justify-end mt-6">
-                <x-primary-button class="bg-blue-500 hover:bg-blue-400 text-white px-6 py-3 rounded-xl transition-colors duration-200">
+                <x-primary-button class="px-6 py-3 text-white transition-colors duration-200 bg-blue-500 hover:bg-blue-400 rounded-xl">
                     {{ __('Confirm') }}
                 </x-primary-button>
             </div>

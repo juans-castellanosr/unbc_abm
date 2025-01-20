@@ -12,7 +12,7 @@ return [
                 'port' => env('PUSHER_PORT', 6001),
                 'scheme' => env('PUSHER_SCHEME', 'http'),
                 'cluster' => env('PUSHER_APP_CLUSTER', 'mt1'),
-                'encrypted' => true,
+                'encrypted' => env('PUSHER_SCHEME') === 'https',
                 'useTLS' => env('PUSHER_SCHEME') === 'https'
             ]
         ]

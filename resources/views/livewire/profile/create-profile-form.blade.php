@@ -19,9 +19,25 @@ $createUser = function () {
     $validated = $this->validate([
         'name' => ['required', 'string', 'max:255'],
         'lastname' => ['required', 'string', 'max:255'],
-        'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users'],
-        'phone_number' => ['required', 'string', 'max:255'],
-        'password' => ['required', 'string', 'confirmed', Password::defaults()],
+        'email' => [
+            'required',
+            'string',
+            'email',
+            'lowercase',
+            'max:255',
+            'unique:users',
+            'regex:/^[^@]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$/',
+        ],
+        'phone_number' => ['required', 'string', 'max:255', 'regex:/^\+?[0-9\s]+$/'],
+        'password' => [
+            'required',
+            'string',
+            'confirmed',
+            Password::min(8)
+                ->mixedCase()
+                ->numbers()
+                ->symbols()
+        ]
     ]);
 
     $user = User::create([
@@ -32,9 +48,14 @@ $createUser = function () {
         'password' => Hash::make($validated['password']),
     ]);
 
+    $this->dispatch('profile-created');
     $this->dispatch('close-modal', 'confirm-user-create');
 
-    $user->sendEmailVerificationNotification();
+    try {
+        $user->sendEmailVerificationNotification();
+    } catch (\Exception $e) {
+        \Log::error("The email could not be sent.", ['exception' => $e]);
+    }
 
     $this->reset(['name', 'lastname', 'email', 'phone_number', 'password', 'password_confirmation']);
 };
@@ -55,13 +76,13 @@ $createUser = function () {
     <form wire:submit="createUser" class="mt-6 space-y-6">
         <div>
             <x-input-label for="name" :value="__('Name')" class="text-[#e2e8f0]" />
-            <x-text-input 
-                wire:model="name" 
-                id="name" 
-                name="name" 
-                type="text" 
-                class="mt-1 block w-full h-12 rounded-xl bg-[#252f3f] border border-[#475569] px-4 text-[#e2e8f0] focus:border-[#475569] focus:ring focus:ring-[#475569] focus:ring-opacity-50"  
-                autocomplete="name" 
+            <x-text-input
+                wire:model="name"
+                id="name"
+                name="name"
+                type="text"
+                class="mt-1 block w-full h-12 rounded-xl bg-[#252f3f] border border-[#475569] px-4 text-[#e2e8f0] focus:border-[#475569] focus:ring focus:ring-[#475569] focus:ring-opacity-50"
+                autocomplete="name"
                 required autofocus
             />
             <x-input-error class="mt-2" :messages="$errors->get('name')" />
@@ -69,13 +90,13 @@ $createUser = function () {
 
         <div>
             <x-input-label for="lastname" :value="__('Lastname')" class="text-[#e2e8f0]" />
-            <x-text-input 
-                wire:model="lastname" 
-                id="lastname" 
-                name="lastname" 
-                type="text" 
-                class="mt-1 block w-full h-12 rounded-xl bg-[#252f3f] border border-[#475569] px-4 text-[#e2e8f0] focus:border-[#475569] focus:ring focus:ring-[#475569] focus:ring-opacity-50"  
-                autocomplete="lastname" 
+            <x-text-input
+                wire:model="lastname"
+                id="lastname"
+                name="lastname"
+                type="text"
+                class="mt-1 block w-full h-12 rounded-xl bg-[#252f3f] border border-[#475569] px-4 text-[#e2e8f0] focus:border-[#475569] focus:ring focus:ring-[#475569] focus:ring-opacity-50"
+                autocomplete="lastname"
                 required autofocus
             />
             <x-input-error class="mt-2" :messages="$errors->get('lastname')" />
@@ -83,13 +104,13 @@ $createUser = function () {
 
         <div>
             <x-input-label for="email" :value="__('Email')" class="text-[#e2e8f0]" />
-            <x-text-input 
-                wire:model="email" 
-                id="email" 
-                name="email" 
-                type="email" 
-                class="mt-1 block w-full h-12 rounded-xl bg-[#252f3f] border border-[#475569] px-4 text-[#e2e8f0] focus:border-[#475569] focus:ring focus:ring-[#475569] focus:ring-opacity-50"  
-                autocomplete="email" 
+            <x-text-input
+                wire:model="email"
+                id="email"
+                name="email"
+                type="email"
+                class="mt-1 block w-full h-12 rounded-xl bg-[#252f3f] border border-[#475569] px-4 text-[#e2e8f0] focus:border-[#475569] focus:ring focus:ring-[#475569] focus:ring-opacity-50"
+                autocomplete="email"
                 required autofocus
             />
             <x-input-error class="mt-2" :messages="$errors->get('email')" />
@@ -97,13 +118,13 @@ $createUser = function () {
 
         <div>
             <x-input-label for="phone_number" :value="__('Phone number')" class="text-[#e2e8f0]" />
-            <x-text-input 
-                wire:model="phone_number" 
-                id="phone_number" 
-                name="phone_number" 
-                type="text" 
-                class="mt-1 block w-full h-12 rounded-xl bg-[#252f3f] border border-[#475569] px-4 text-[#e2e8f0] focus:border-[#475569] focus:ring focus:ring-[#475569] focus:ring-opacity-50"  
-                autocomplete="phone_number" 
+            <x-text-input
+                wire:model="phone_number"
+                id="phone_number"
+                name="phone_number"
+                type="text"
+                class="mt-1 block w-full h-12 rounded-xl bg-[#252f3f] border border-[#475569] px-4 text-[#e2e8f0] focus:border-[#475569] focus:ring focus:ring-[#475569] focus:ring-opacity-50"
+                autocomplete="phone_number"
                 required autofocus
             />
             <x-input-error class="mt-2" :messages="$errors->get('phone_number')" />
@@ -111,13 +132,13 @@ $createUser = function () {
 
         <div>
             <x-input-label for="password" :value="__('Password')" class="text-[#e2e8f0]" />
-            <x-text-input 
-                wire:model="password" 
-                id="password" 
-                name="password" 
-                type="password" 
-                class="mt-1 block w-full h-12 rounded-xl bg-[#252f3f] border border-[#475569] px-4 text-[#e2e8f0] focus:border-[#475569] focus:ring focus:ring-[#475569] focus:ring-opacity-50"  
-                autocomplete="password" 
+            <x-text-input
+                wire:model="password"
+                id="password"
+                name="password"
+                type="password"
+                class="mt-1 block w-full h-12 rounded-xl bg-[#252f3f] border border-[#475569] px-4 text-[#e2e8f0] focus:border-[#475569] focus:ring focus:ring-[#475569] focus:ring-opacity-50"
+                autocomplete="password"
                 required autofocus
             />
             <x-input-error class="mt-2" :messages="$errors->get('password')" />
@@ -125,20 +146,24 @@ $createUser = function () {
 
         <div>
             <x-input-label for="password_confirmation" :value="__('Confirm Password')" class="text-[#e2e8f0]" />
-            <x-text-input 
-                wire:model="password_confirmation" 
-                id="password_confirmation" 
-                name="password_confirmation" 
-                type="password" 
-                class="mt-1 block w-full h-12 rounded-xl bg-[#252f3f] border border-[#475569] px-4 text-[#e2e8f0] focus:border-[#475569] focus:ring focus:ring-[#475569] focus:ring-opacity-50"  
-                autocomplete="password_confirmation" 
+            <x-text-input
+                wire:model="password_confirmation"
+                id="password_confirmation"
+                name="password_confirmation"
+                type="password"
+                class="mt-1 block w-full h-12 rounded-xl bg-[#252f3f] border border-[#475569] px-4 text-[#e2e8f0] focus:border-[#475569] focus:ring focus:ring-[#475569] focus:ring-opacity-50"
+                autocomplete="password_confirmation"
                 required autofocus
             />
             <x-input-error class="mt-2" :messages="$errors->get('password_confirmation')" />
         </div>
 
-        <div class="mt-6 flex items-center">
-            <div class="ml-auto flex items-center">
+        <div class="flex items-center mt-6">
+             <x-action-message class="me-3" on="profile-created">
+                {{ __('User profile has been created.') }}
+            </x-action-message>
+
+            <div class="flex items-center ml-auto">
                 <x-secondary-button x-on:click.prevent="$dispatch('close-modal', 'confirm-user-create')">
                     {{ __('Cancel') }}
                 </x-secondary-button>

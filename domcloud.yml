@@ -1,9 +1,9 @@
 source: https://github.com/juans-castellanosr/unbc_abm.git
 root: public_html/public
 features:
-  - php 8.4
+  - php 8.3
   - mysql
-  - node 18.20.5
+  - node 18
 
 php:
   expose_php: "off"
@@ -79,10 +79,16 @@ nginx:
         - "X-Forwarded-Proto $scheme"
 
 commands:
+  # Installs PHP/Node.js dependencies, Soketi, and PM2
   - composer install
   - npm install -g @soketi/soketi
   - npm install -g pm2
   - npm install
+
+  # PM2 process management commands for deployment
+  - pm2 stop all || true
+  - pm2 delete all || true
+  - pm2 save --force || true
 
   # Initial configuration
   - cp .env.example .env
@@ -99,13 +105,13 @@ commands:
 
   # Mail configuration
   - sed -ri "s/(# )?MAIL_MAILER=.*/MAIL_MAILER=smtp/g" .env
-  - sed -ri "s/(# )?MAIL_HOST=.*/MAIL_HOST=smtp.mailersend.net/g" .env
+  - sed -ri "s/(# )?MAIL_HOST=.*/MAIL_HOST=smtp-relay.brevo.com/g" .env
   - sed -ri "s/(# )?MAIL_PORT=.*/MAIL_PORT=587/g" .env
-  - sed -ri "s/(# )?MAIL_USERNAME=.*/MAIL_USERNAME=MS_EJ6XIw@trial-x2p03477zzk4zdrn.mlsender.net/g" .env
-  - sed -ri "s/(# )?MAIL_PASSWORD=.*/MAIL_PASSWORD=k4jnj8u3qsXTQLQm/g" .env
+  - sed -ri "s/(# )?MAIL_USERNAME=.*/MAIL_USERNAME=840291001@smtp-brevo.com/g" .env
+  - sed -ri "s/(# )?MAIL_PASSWORD=.*/MAIL_PASSWORD=Vvp03EGT7jfSPCa5/g" .env
   - sed -ri "s/(# )?MAIL_ENCRYPTION=.*/MAIL_ENCRYPTION=tls/g" .env
-  - sed -ri "s/(# )?MAIL_SCHEME=.*/MAIL_SCHEME=smtps/g" .env
-  - sed -ri "s/(# )?MAIL_FROM_ADDRESS=.*/MAIL_FROM_ADDRESS=hello@trial-x2p03477zzk4zdrn.mlsender.net/g" .env
+  - sed -ri "s/(# )?MAIL_SCHEME=.*/MAIL_SCHEME=smtp/g" .env
+  - sed -ri "s/(# )?MAIL_FROM_ADDRESS=.*/MAIL_FROM_ADDRESS=jsebascastel2003@gmail.com/g" .env
 
   # Vite configuration
   - sed -ri "s/(# )?VITE_PUSHER_PORT=.*/VITE_PUSHER_PORT=443/g" .env
@@ -134,11 +140,14 @@ commands:
   - php artisan optimize
 
   # Post-installation
+  - mkdir -p ~/logs
   - mv public/build/.vite/manifest.json public/build/manifest.json || true
+  - mv soketi.config.js ~ || true
   - chmod -R 775 storage bootstrap/cache
   - echo "Contact: mailto:security@${DOMAIN}" > public/.well-known/security.txt
   - echo "Expires: $(date -d '+1 year' -u +'%Y-%m-%dT%H:%M:%SZ')" >> public/.well-known/security.txt
 
   # Start of services
-  - pm2 start soketi-pm2 -- start
-  - pm2 save
+  - pm2 start ~/soketi.config.js
+  - pm2 save --force
+  - php artisan queue:work --daemon > storage/logs/worker.log 2>&1 &

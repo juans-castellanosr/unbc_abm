@@ -24,7 +24,15 @@ state([
 rules([
     'token' => ['required'],
     'email' => ['required', 'string', 'email'],
-    'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
+    'password' => [
+            'required',
+            'string',
+            'confirmed',
+            Rules\Password::min(8)
+                ->mixedCase()
+                ->numbers()
+                ->symbols()
+        ]
 ]);
 
 $resetPassword = function () {
@@ -60,46 +68,46 @@ $resetPassword = function () {
         <form wire:submit="resetPassword">
             <div class="mb-4">
                 <x-input-label for="email" :value="__('Email')" class="text-[#e2e8f0]" />
-                <x-text-input 
-                    wire:model="email" 
-                    id="email" 
+                <x-text-input
+                    wire:model="email"
+                    id="email"
                     class="w-full h-12 rounded-xl bg-[#334155] border border-[#475569] px-4 text-[#e2e8f0] mt-2"
-                    type="email" 
-                    name="email" 
-                    required 
-                    autofocus 
+                    type="email"
+                    name="email"
+                    required
+                    autofocus
                     autocomplete="username" />
                 <x-input-error :messages="$errors->get('email')" class="mt-2" />
             </div>
 
             <div class="mb-4">
                 <x-input-label for="password" :value="__('Password')" class="text-[#e2e8f0]" />
-                <x-text-input 
-                    wire:model="password" 
-                    id="password" 
+                <x-text-input
+                    wire:model="password"
+                    id="password"
                     class="w-full h-12 rounded-xl bg-[#334155] border border-[#475569] px-4 text-[#e2e8f0] mt-2"
-                    type="password" 
-                    name="password" 
-                    required 
+                    type="password"
+                    name="password"
+                    required
                     autocomplete="new-password" />
                 <x-input-error :messages="$errors->get('password')" class="mt-2" />
             </div>
 
             <div class="mb-6">
                 <x-input-label for="password_confirmation" :value="__('Confirm Password')" class="text-[#e2e8f0]" />
-                <x-text-input 
-                    wire:model="password_confirmation" 
-                    id="password_confirmation" 
+                <x-text-input
+                    wire:model="password_confirmation"
+                    id="password_confirmation"
                     class="w-full h-12 rounded-xl bg-[#334155] border border-[#475569] px-4 text-[#e2e8f0] mt-2"
                     type="password"
-                    name="password_confirmation" 
-                    required 
+                    name="password_confirmation"
+                    required
                     autocomplete="new-password" />
                 <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
             </div>
 
             <div class="flex justify-end">
-                <x-primary-button class="bg-blue-500 hover:bg-blue-400 text-white px-6 py-3 rounded-xl transition-colors duration-200">
+                <x-primary-button class="px-6 py-3 text-white transition-colors duration-200 bg-blue-500 hover:bg-blue-400 rounded-xl">
                     {{ __('Reset Password') }}
                 </x-primary-button>
             </div>

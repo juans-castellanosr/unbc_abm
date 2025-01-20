@@ -6,7 +6,7 @@ layout('layouts.app');
 ?>
 
 <div class="w-full h-auto from-[#0f172a] to-[#1e293b] flex flex-col justify-start items-center p-4">
-    <div class="max-w-7xl mx-auto">
+    <div class="mx-auto max-w-7xl">
         <div class="mb-6">
             <h2 class="text-xl font-semibold text-[#e2e8f0] leading-tight">
                 {{ __('Profile') }}

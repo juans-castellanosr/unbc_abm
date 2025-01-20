@@ -4,10 +4,11 @@ namespace App\Models;
 
 use App\Events\UserDatabaseChanged;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable;
 
@@ -16,7 +17,7 @@ class User extends Authenticatable
         'name',
         'lastname',
         'email',
-        'phone_number',  
+        'phone_number',
         'password'
     ];
 
@@ -38,11 +39,11 @@ class User extends Authenticatable
         static::created(function ($user) {
             UserDatabaseChanged::dispatch('created', $user->id);
         });
-    
+
         static::updated(function ($user) {
             UserDatabaseChanged::dispatch('updated', $user->id);
         });
-    
+
         static::deleted(function ($user) {
             UserDatabaseChanged::dispatch('deleted', $user->id);
         });

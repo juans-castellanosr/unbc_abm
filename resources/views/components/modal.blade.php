@@ -55,14 +55,14 @@ $maxWidth = [
     x-on:keydown.tab.prevent="$event.shiftKey || nextFocusable().focus()"
     x-on:keydown.shift.tab.prevent="prevFocusable().focus()"
     x-show="show"
-    class="fixed inset-0 overflow-y-auto z-50 flex items-center justify-center min-h-screen p-4"
+    class="fixed inset-0 z-50 flex items-center justify-center min-h-screen p-4 overflow-y-auto"
     style="display: {{ $show ? 'block' : 'none' }};"
     {{ $attributes->merge(['class' => 'fixed inset-0 overflow-y-auto px-4 py-6 sm:px-0 z-50']) }}
 
 >
     <div
         x-show="show"
-        class="fixed inset-0 transform transition-all"
+        class="fixed inset-0 transition-all transform"
         x-on:click="show = false"
         x-transition:enter="ease-out duration-300"
         x-transition:enter-start="opacity-0"

@@ -48,30 +48,30 @@ $getDeleteMessage = fn() => $this->userToDelete
     </p>
     <form wire:submit="deleteUser" class="mt-6 space-y-6">
         <div class="mt-6">
-            <x-text-input 
-                wire:model="password" 
-                id="password" 
-                name="password" 
-                type="password" 
-                class="mt-1 block w-full h-12 rounded-xl bg-[#252f3f] border border-[#475569] px-4 text-[#e2e8f0] focus:border-[#475569] focus:ring focus:ring-[#475569] focus:ring-opacity-50" 
-                placeholder="{{ __('Your Password') }}" 
-                autocomplete="password" 
-                autocorrect="off" 
+            <x-text-input
+                wire:model="password"
+                id="password"
+                name="password"
+                type="password"
+                class="mt-1 block w-full h-12 rounded-xl bg-[#252f3f] border border-[#475569] px-4 text-[#e2e8f0] focus:border-[#475569] focus:ring focus:ring-[#475569] focus:ring-opacity-50"
+                placeholder="{{ __('Your Password') }}"
+                autocomplete="password"
+                autocorrect="off"
                 autocapitalize="off"
                 autofill="false"
-                required 
+                required
                 autofocus
             />
 
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
-        <div class="mt-6 flex items-center">
+        <div class="flex items-center mt-6">
             <x-action-message class="me-3" on="profile-deleted">
                 {{ $this->getDeleteMessage() }}
             </x-action-message>
 
-            <div class="ml-auto flex items-center">
+            <div class="flex items-center ml-auto">
                 <x-secondary-button x-on:click.prevent="$dispatch('close-modal', 'confirm-user-delete')">
                     {{ __('Cancel') }}
                 </x-secondary-button>

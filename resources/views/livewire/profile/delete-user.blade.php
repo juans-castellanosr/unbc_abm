@@ -21,8 +21,8 @@ state([
                 {{ __('Once the account is deleted, all of its resources and data will be permanently deleted. Before deleting the account, please ensure this action is necessary.') }}
             </p>
         </header>
-        <div class="mt-6 flex items-center">
-            <x-danger-button x-data="" class="ml-auto flex items-center" x-on:click.prevent="$dispatch('open-modal', 'confirm-user-delete')">
+        <div class="flex items-center mt-6">
+            <x-danger-button x-data="" class="flex items-center ml-auto" x-on:click.prevent="$dispatch('open-modal', 'confirm-user-delete')">
                 {{ __('Delete Account') }}
             </x-danger-button>
         </div>
